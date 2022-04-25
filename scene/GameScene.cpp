@@ -3,6 +3,8 @@
 #include <cassert>
 #include <random>
 
+
+
 using namespace DirectX;
 
 GameScene::GameScene() {}
@@ -94,7 +96,9 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	XMFLOAT3 move = {0, 0, 0};
+	//XMFLOAT3 move = {0, 0, 0};
+	XMFLOAT3 flont = {0, 0, 1};
+	XMFLOAT3 result = {0, 0, 1};
 
 	const float kCharacterSpeed = 0.2f;
 
@@ -110,17 +114,30 @@ void GameScene::Update() {
 	if (input_->PushKey(DIK_LEFT)) {
 		worldTransform_[PartID::Root].rotation_.y += -kChestRotSpeed;
 	}
+	result.x = cos(worldTransform_->rotation_.y) * flont.x +
+	           sin(worldTransform_->rotation_.y) * flont.z;
+
+	result.z = ( - sin(worldTransform_->rotation_.y)) * flont.x +
+	           cos(worldTransform_->rotation_.y) * flont.z;
+
 	
 	if (input_->PushKey(DIK_UP)) {
-		move = {
+		/*move = {
 		  0,
 		  0,
 		  kCharacterSpeed,
-		};
+		};*/
+		worldTransform_[PartID::Root].translation_.x += kCharacterSpeed * result.x;
+		worldTransform_[PartID::Root].translation_.z += kCharacterSpeed * result.z;
+
 	}
 	if (input_->PushKey(DIK_DOWN)) {
-		move = {0, 0, -kCharacterSpeed};
+		/*move = {0, 0, -kCharacterSpeed};*/
+		worldTransform_[PartID::Root].translation_.x -= kCharacterSpeed * result.x;
+		worldTransform_[PartID::Root].translation_.z -= kCharacterSpeed * result.z;
 	}
+
+
 
 	XMFLOAT3 move_eye = {0, 0, 0};
 
@@ -164,9 +181,7 @@ void GameScene::Update() {
 	viewProjection_.up = {cosf(viewAngle), sinf(viewAngle), 0.0f};*/
 	
 
-	worldTransform_[PartID::Root].translation_.x += move.x;
-	worldTransform_[PartID::Root].translation_.y += move.y;
-	worldTransform_[PartID::Root].translation_.z += move.z;
+	
 
 #pragma region
 	//視野角、射影
